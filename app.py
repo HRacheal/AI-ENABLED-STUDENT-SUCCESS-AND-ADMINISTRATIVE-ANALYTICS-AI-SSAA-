@@ -67,39 +67,35 @@ with col2:
     )
 
 with col3:
-    gender = st.number_input(
+    gender_choice = st.selectbox(
         "Gender",
-        min_value=0,
-        max_value=1,
-        value=0
+        options=["Female", "Male"]
     )
+    gender = 0 if gender_choice == "Female" else 1
 
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    displaced = st.number_input(
-        "Displaced",
-        min_value=0,
-        max_value=1,
-        value=0
+    displaced_choice = st.selectbox(
+        "Displaced (Living away from home)",
+        options=["No", "Yes"]
     )
+    displaced = 1 if displaced_choice == "Yes" else 0
 
 with col2:
-    international = st.number_input(
-        "International",
-        min_value=0,
-        max_value=1,
-        value=0
+    international_choice = st.selectbox(
+        "International Student",
+        options=["No", "Yes"]
     )
+    international = 1 if international_choice == "Yes" else 0
 
 with col3:
-    educational_special_needs = st.number_input(
+    educational_special_needs_choice = st.selectbox(
         "Educational Special Needs",
-        min_value=0,
-        max_value=1,
-        value=0
+        options=["No", "Yes"]
     )
+    educational_special_needs = 1 if educational_special_needs_choice == "Yes" else 0
 
 
 # ==========================================
@@ -127,25 +123,24 @@ with col2:
 
 with col3:
     course = st.number_input(
-        "Course",
+        "Course Code",
         min_value=1,
         value=1
     )
 
 with col4:
-    daytime_attendance = st.number_input(
-        "Daytime/Evening Attendance",
-        min_value=0,
-        max_value=1,
-        value=1
+    daytime_attendance_choice = st.selectbox(
+        "Attendance Schedule",
+        options=["Evening", "Daytime"]
     )
+    daytime_attendance = 1 if daytime_attendance_choice == "Daytime" else 0
 
 
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     previous_qualification = st.number_input(
-        "Previous Qualification",
+        "Previous Qualification Code",
         min_value=1,
         value=1
     )
@@ -215,12 +210,11 @@ with col1:
     )
 
 with col2:
-    scholarship_holder = st.number_input(
+    scholarship_holder_choice = st.selectbox(
         "Scholarship Holder",
-        min_value=0,
-        max_value=1,
-        value=0
+        options=["No", "Yes"]
     )
+    scholarship_holder = 1 if scholarship_holder_choice == "Yes" else 0
 
 
 # ==========================================
@@ -232,20 +226,19 @@ st.subheader("Financial & Economic Information")
 col1, col2 = st.columns(2)
 
 with col1:
-    debtor = st.number_input(
-        "Debtor",
-        min_value=0,
-        max_value=1,
-        value=0
+    debtor_choice = st.selectbox(
+        "Has Tuition Debt",
+        options=["No", "Yes"]
     )
+    debtor = 1 if debtor_choice == "Yes" else 0
 
 with col2:
-    tuition_fees_up_to_date = st.number_input(
+    tuition_fees_up_to_date_choice = st.selectbox(
         "Tuition Fees Up to Date",
-        min_value=0,
-        max_value=1,
-        value=1
+        options=["No", "Yes"],
+        index=1
     )
+    tuition_fees_up_to_date = 1 if tuition_fees_up_to_date_choice == "Yes" else 0
 
 col1, col2, col3 = st.columns(3)
 
@@ -460,27 +453,14 @@ if predict_button:
     })
 
 
-    # --------------------------------------
     # Preprocess input
-    # --------------------------------------
-
     student_processed = preprocessor.transform(student_data)
 
-
-    # --------------------------------------
     # Prediction
-    # --------------------------------------
-
     prediction = model.predict(student_processed)
+    prediction_probability = model.predict_proba(student_processed)
 
-    prediction_probability = model.predict_proba(
-        student_processed
-    )
-
-
-    predicted_class = label_encoder.inverse_transform(
-        prediction
-    )[0]
+    predicted_class = label_encoder.inverse_transform(prediction)[0]
 
 
     # ======================================
@@ -490,19 +470,11 @@ if predict_button:
     st.subheader("Prediction Result")
 
     if predicted_class == "Dropout":
-        st.error(
-            f"Predicted Outcome: **{predicted_class}**"
-        )
-
+        st.error(f"Predicted Outcome: **{predicted_class}**")
     elif predicted_class == "Enrolled":
-        st.warning(
-            f"Predicted Outcome: **{predicted_class}**"
-        )
-
+        st.warning(f"Predicted Outcome: **{predicted_class}**")
     else:
-        st.success(
-            f"Predicted Outcome: **{predicted_class}**"
-        )
+        st.success(f"Predicted Outcome: **{predicted_class}**")
 
 
     # ======================================
@@ -517,18 +489,13 @@ if predict_button:
     )
 
     probability_df = probability_df.T.reset_index()
-
-    probability_df.columns = [
-        "Outcome",
-        "Probability"
-    ]
+    probability_df.columns = ["Outcome", "Probability"]
 
     probability_df["Probability"] = (
         probability_df["Probability"] * 100
     ).round(2)
 
     display_df = probability_df.copy()
-
     display_df["Probability"] = (
         display_df["Probability"].astype(str) + "%"
     )
@@ -537,27 +504,52 @@ if predict_button:
 
 
     # ======================================
-    # 13. INTERPRETATION
+    # 13. FEATURE EXPLANATION / REASONS
     # ======================================
 
-    st.subheader("Interpretation")
+    st.divider()
+    st.subheader("💡 Key Reasons Behind This Prediction")
 
-    highest_probability = probability_df.loc[
-        probability_df["Probability"].idxmax()
-    ]
+    class_index = list(label_encoder.classes_).index(predicted_class)
 
-    st.write(
-        f"The model predicts **{predicted_class}** "
-        f"as the most likely student outcome."
-    )
+    if hasattr(model, "coef_"):
+        coefficients = model.coef_[class_index]
 
-    st.write(
-        f"The highest predicted probability is "
-        f"**{highest_probability['Probability']}%**."
-    )
+        try:
+            feature_names = preprocessor.get_feature_names_out()
+        except AttributeError:
+            feature_names = student_data.columns
 
-    st.info(
-        "This prediction is generated by a machine learning model "
-        "and should support, not replace, professional academic "
-        "advising and decision-making."
-    )
+        impacts = student_processed[0] * coefficients
+
+        explanation_df = pd.DataFrame({
+            "Feature": feature_names,
+            "Impact": impacts
+        })
+
+        explanation_df["Feature"] = (
+            explanation_df["Feature"]
+            .str.replace("num__", "")
+            .str.replace("cat__", "")
+            .str.replace("remainder__", "")
+        )
+
+        top_positive = explanation_df.sort_values(
+            by="Impact", ascending=False
+        ).head(3)
+
+        top_negative = explanation_df.sort_values(
+            by="Impact", ascending=True
+        ).head(3)
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.markdown(f"**Top Factors Leading to '{predicted_class}':**")
+            for _, row in top_positive.iterrows():
+                st.write(f"🟢 **{row['Feature']}**")
+
+        with col2:
+            st.markdown(f"**Top Factors Working Against '{predicted_class}':**")
+            for _, row in top_negative.iterrows():
+                st.write(f"🔴 **{row['Feature']}**")
