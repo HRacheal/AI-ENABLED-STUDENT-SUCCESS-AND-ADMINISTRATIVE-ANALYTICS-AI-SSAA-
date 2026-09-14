@@ -62,7 +62,7 @@ st.divider()
 # ==========================================
 # 4. SIDEBAR - STUDENT PROFILE INPUTS
 # ==========================================
-st.sidebar.header("📋 Student Profile Inputs")
+st.sidebar.header(" Student Profile Inputs")
 
 st.sidebar.subheader("Demographics & Registration")
 gender = st.sidebar.selectbox("Gender", ["M", "F"])
@@ -119,7 +119,7 @@ input_df = pd.DataFrame([input_dict])
 col_main, col_stats = st.columns([2, 1])
 
 with col_main:
-    st.subheader("🔍 Outcome Prediction")
+    st.subheader(" Outcome Prediction")
     
     # Preprocess inputs
     try:
@@ -133,13 +133,13 @@ with col_main:
     
     # Display primary outcome badge
     if prediction_label == "Distinction":
-        st.success(f"### Predicted Outcome: **{prediction_label}** 🌟")
+        st.success(f"### Predicted Outcome: **{prediction_label}** ")
     elif prediction_label == "Pass":
-        st.info(f"### Predicted Outcome: **{prediction_label}** ✅")
+        st.info(f"### Predicted Outcome: **{prediction_label}** ")
     elif prediction_label == "Fail":
-        st.warning(f"### Predicted Outcome: **{prediction_label}** ⚠️")
+        st.warning(f"### Predicted Outcome: **{prediction_label}** ")
     else:  # Withdrawn
-        st.error(f"### Predicted Outcome: **{prediction_label}** 🚨")
+        st.error(f"### Predicted Outcome: **{prediction_label}** ")
 
     # Display prediction probability distribution
     st.markdown("**Probability Breakdown Across Outcomes:**")
@@ -163,7 +163,7 @@ with col_main:
     )
 
 with col_stats:
-    st.subheader("📊 Key Engagement Metrics")
+    st.subheader(" Key Engagement Metrics")
     st.metric("VLE Active Days", f"{active_days} days")
     st.metric("Total VLE Interactions", f"{total_clicks:,} clicks")
     st.metric("Weighted Score", f"{total_weighted_score:.1f}%")
@@ -172,7 +172,7 @@ with col_stats:
 # 6. FEATURE IMPORTANCE EXPLANATIONS
 # ==========================================
 st.divider()
-st.subheader("💡 Key Drivers Behind Prediction")
+st.subheader(" Key Drivers Behind Prediction")
 
 try:
     feat_names = list(preprocessor.get_feature_names_out())
