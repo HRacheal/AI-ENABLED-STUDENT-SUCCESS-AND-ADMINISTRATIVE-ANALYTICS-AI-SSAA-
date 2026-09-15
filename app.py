@@ -7,9 +7,10 @@ import joblib
 # 1. LOAD SAVED MODEL AND PREPROCESSORS
 # ==========================================
 
-model = joblib.load("logistic_regression_model.pkl")
-preprocessor = joblib.load("student_preprocessor.pkl")
-label_encoder = joblib.load("target_label_encoder.pkl")
+# Match the new distinct filenames
+model = joblib.load("dropout_logistic_regression_model.pkl")
+preprocessor = joblib.load("dropout_student_preprocessor.pkl")
+label_encoder = joblib.load("dropout_target_label_encoder.pkl")
 
 
 # ==========================================
